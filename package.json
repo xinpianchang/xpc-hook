@@ -5,7 +5,19 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:js": "babel src --no-comments --extensions \".ts,.tsx\" --out-dir dist",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build": "npm run build:types && npm run build:js",
+    "pre:types": "tsc --build tsconfig.prod.json",
+    "pre:js": "babel . --ignore \"src,node_modules\" --no-comments --extensions .ts -d .",
+    "pre": "npm run pre:types && npm run pre:js",
+    "prepublishOnly": "npm run clean && npm run build && npm run pre",
+    "clean": "rimraf dist && rimraf ./*.d.ts && rimraf ./*.js",
+    "lint": "eslint src/**/* --fix",
+    "types:check": "tsc --noEmit",
+    "types:watch": "npm run types:check -- --watch",
+    "start": "npm run build:js -- --watch",
+    "dryrun": "npm publish --access public -dry-run"
   },
   "repository": {
     "type": "git",
@@ -18,7 +30,8 @@
     "react",
     "typescript"
   ],
-  "author": "",
+  "author": "tanghongyu <tanghongyu@xinpianchang.com>",
+  "homepage": "https://github.com/xinpianchang/xpc-hook#readme",
   "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.10.1",
@@ -29,13 +42,18 @@
     "@babel/preset-typescript": "^7.10.1",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
+    "eslint": "^7.2.0",
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-jsx-a11y": "^6.3.0",
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "^4.0.4",
-    "typescript": "^3.9.5",
-    "eslint": "^7.2.0",
     "lint-staged": "^10.2.9",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "@types/react": "^16.9.38",
+    "react": "^16.13.1",
+    "resize-observer-polyfill": "^1.5.1"
   }
 }
