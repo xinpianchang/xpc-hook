@@ -1,8 +1,8 @@
 import React, { useState, RefObject } from 'react'
-import useEvent from './useEvent'
-import useClickAway from './useClickAway'
+import { useEvent } from './useEvent'
+import { useClickAway } from './useClickAway'
 
-export default function useHover<T extends HTMLElement>(
+export function useHover<T extends HTMLElement>(
   refOrElement: T | RefObject<T> | null,
   supportTouch = false
 ): [ boolean, React.Dispatch<React.SetStateAction<boolean>> ] {

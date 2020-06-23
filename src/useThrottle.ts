@@ -1,5 +1,5 @@
 import { DependencyList } from 'react'
-import useThrottleCallback from './useThrottleCallback'
+import { useThrottleCallback } from './useThrottleCallback'
 
 /**
  * throttle a callback invoking
@@ -7,7 +7,7 @@ import useThrottleCallback from './useThrottleCallback'
  * @param ms throttling delay
  * @param deps dependency list
  */
-export default function useThrottle<R>(
+export function useThrottle<R>(
   callback: () => R,
   ms: number,
   deps?: DependencyList,

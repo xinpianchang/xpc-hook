@@ -1,5 +1,5 @@
 import { useEffect, DependencyList, RefObject } from 'react'
-import createEvent, { EventListenerMap, SupportEventTarget, EventNameMap } from './createEvent'
+import { EventListenerMap, SupportEventTarget, EventNameMap, createEvent } from './createEvent'
 
 /**
  * eventtarget listener hook
@@ -9,7 +9,7 @@ import createEvent, { EventListenerMap, SupportEventTarget, EventNameMap } from 
  * @param options event register options
  * @param deps dependency for the event listener
  */
-export default function useEvent<T extends SupportEventTarget, N extends EventNameMap<T>>(
+export function useEvent<T extends SupportEventTarget, N extends EventNameMap<T>>(
   domElementOrRef: T | RefObject<T> | null,
   eventName: N | N[],
   eventListener: EventListenerMap<T, N>,

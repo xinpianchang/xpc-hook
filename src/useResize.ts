@@ -1,11 +1,11 @@
 import { RefObject, useEffect, DependencyList } from 'react'
 import { ResizeEvent } from './ResizeObserverContext'
-import useResizeObserver from './useResizeObserver'
+import { useResizeObserver } from './useResizeObserver'
 import { getElement } from './utils'
 
 export type ResizeCallback = (event: ResizeEvent) => void
 
-export default function useResize<T extends Element>(
+export function useResize<T extends Element>(
   refOrElement: RefObject<T> | T,
   callback: ResizeCallback,
   deps: DependencyList = [],

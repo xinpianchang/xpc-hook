@@ -17,7 +17,7 @@ interface InvokeDescriptor<A extends any[], R, T = any> {
  * @param ms throttling delay
  * @param deps dependency list
  */
-export default function useThrottleCallback<A extends any[], R, F extends (...args: A) => R>(
+export function useThrottleCallback<A extends any[], R, F extends (...args: A) => R>(
   func: F,
   ms: number,
   deps: DependencyList = [],

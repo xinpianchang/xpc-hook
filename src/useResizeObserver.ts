@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { ResizeObserverContext } from './ResizeObserverContext'
 
-export default function useResizeObserver() {
+export function useResizeObserver() {
   return useContext(ResizeObserverContext)
 }

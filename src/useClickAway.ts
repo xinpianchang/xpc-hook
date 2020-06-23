@@ -1,4 +1,4 @@
-import useEvent from './useEvent'
+import { useEvent } from './useEvent'
 import { RefObject, DependencyList, useRef } from 'react'
 import { getElement, getDocument } from './utils'
 
@@ -7,18 +7,18 @@ type EventNameMap = keyof DocumentEventMap
 type EventListenerMap<T extends HTMLElement, K extends EventNameMap>
   = (this: T, event: DocumentEventMap[K]) => any
 
-export default function useClickAway<T extends HTMLElement, N extends EventNameMap>(
+export function useClickAway<T extends HTMLElement, N extends EventNameMap>(
   domElementOrRef: T | RefObject<T> | null,
   eventName: N | N[],
   eventListener: EventListenerMap<T, N>,
   deps?: DependencyList,
 ): void
-export default function useClickAway<T extends HTMLElement>(
+export function useClickAway<T extends HTMLElement>(
   domElementOrRef: T | RefObject<T> | null,
   eventListener: EventListenerMap<T, 'click' | 'touchstart'>,
   deps?: DependencyList,
 ): void
-export default function useClickAway<T extends HTMLElement, N extends EventNameMap>(
+export function useClickAway<T extends HTMLElement, N extends EventNameMap>(
   domElementOrRef: T | RefObject<T> | null,
   eventNameOrListener: N | N[] | EventListenerMap<T, 'click' | 'touchstart'>,
   eventListenerOrDeps?: EventListenerMap<T, N> | DependencyList,

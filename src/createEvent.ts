@@ -37,7 +37,7 @@ export type EventNameMap<T extends SupportEventTarget>
 export type EventListenerMap<T extends SupportEventTarget, K extends EventNameMap<T>>
   = (this: T, event: EventMap<T>[K]) => any
 
-export default function createEvent<T extends SupportEventTarget, N extends EventNameMap<T>>(
+export function createEvent<T extends SupportEventTarget, N extends EventNameMap<T>>(
   domElementOrRef: T | RefObject<T> | null,
   eventName: N | N[],
   eventListener: EventListenerMap<T, N>,
