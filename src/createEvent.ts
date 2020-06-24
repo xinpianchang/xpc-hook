@@ -1,3 +1,7 @@
+/*
+Create events for the DOM
+*/
+
 import { RefObject } from 'react'
 import { getElement } from './utils'
 
