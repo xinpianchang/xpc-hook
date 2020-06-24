@@ -57,5 +57,49 @@
   },
   "peerDependencies": {
     "react": "^16.13.1"
-  }
+  },
+  "engines": {
+    "node": ">= 10.0.0"
+  },
+  "files": [
+    "dist",
+    "index.js",
+    "index.d.ts",
+    "createEvent.js",
+    "createEvent.d.ts",
+    "useArrowKey.js",
+    "useArrowKey.d.ts",
+    "useClickAway.js",
+    "useClickAway.d.ts",
+    "useDevicePixeRatio.js",
+    "useDevicePixeRatio.d.ts",
+    "useDrag.js",
+    "useDrag.d.ts",
+    "useEvent.js",
+    "useEvent.d.ts",
+    "useHover.js",
+    "useHover.d.ts",
+    "useInvalidator.js",
+    "useInvalidator.d.ts",
+    "useRaf.js",
+    "useRaf.d.ts",
+    "useRefObject.js",
+    "useRefObject.d.ts",
+    "useResize.js",
+    "useResize.d.ts",
+    "useResizeObserver.js",
+    "useResizeObserver.d.ts",
+    "useSafeClick.js",
+    "useSafeClick.d.ts",
+    "useSetupCanvas.js",
+    "useSetupCanvas.d.ts",
+    "useShortcutKey.js",
+    "useShortcutKey.d.ts",
+    "useThrottle.js",
+    "useThrottle.d.ts",
+    "useThrottleCallback.js",
+    "useThrottleCallback.d.ts",
+    "useUpdate.js",
+    "useUpdate.d.ts"
+  ]
 }
