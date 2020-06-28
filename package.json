@@ -1,6 +1,6 @@
 {
   "name": "@newstudios/hook",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "common hooks for react",
   "main": "index.js",
   "types": "index.d.ts",
