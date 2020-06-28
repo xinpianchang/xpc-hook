@@ -9,13 +9,24 @@ export interface ResizeObserverProviderProps {
   observer?: ResizeObserver
 }
 
+type Target = Element & { __resize_event__: boolean }
+
+function isDispatchingResizeEvent(target: Target) {
+  return target.__resize_event__ === true
+}
+
 function createResizeObserver() {
   return new ResizeObserver(entries => {
     entries.forEach(entry => {
       if (entry.target) {
-        const event = new Event('resize') as ResizeEvent
-        event.contentRect = entry.contentRect as DOMRectReadOnly
-        entry.target.dispatchEvent(event)
+        const target = entry.target as Target
+        if (!isDispatchingResizeEvent(target)) {
+          target.__resize_event__ = true
+          const event = new Event('resize') as ResizeEvent
+          event.contentRect = entry.contentRect as DOMRectReadOnly
+          entry.target.dispatchEvent(event)
+          delete target.__resize_event__
+        }
       }
     })
   })

@@ -31,7 +31,7 @@ export interface UseRaf {
 }
 
 export const useRaf: UseRaf = function useRaf(
-  timeoutMs: number = 1e10,
+  timeoutMs = 1e10,
   delayMs: number | null = 0,
   callback?: (() => void) | DependencyList,
   deps: DependencyList = [],
@@ -52,6 +52,7 @@ export const useRaf: UseRaf = function useRaf(
       // start raf
       let raf = 0
       let timerStop: ReturnType<typeof setTimeout>
+      let stopped = false
 
       const onFrame = () => {
         cbRef.current()
@@ -59,13 +60,14 @@ export const useRaf: UseRaf = function useRaf(
       }
 
       const loop = () => {
-        raf = requestAnimationFrame(onFrame)
+        raf = stopped ? 0 : requestAnimationFrame(onFrame)
       }
 
       const onStart = () => {
         timerStop = setTimeout(() => {
           cancelAnimationFrame(raf)
           cbRef.current()
+          stopped = true
         }, timeoutMs)
         loop()
       }
@@ -76,6 +78,7 @@ export const useRaf: UseRaf = function useRaf(
         clearTimeout(timerStop)
         clearTimeout(timerDelay)
         cancelAnimationFrame(raf)
+        stopped = true
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
