@@ -17,7 +17,7 @@
     "types:check": "tsc --noEmit",
     "types:watch": "npm run types:check -- --watch",
     "start": "npm run build:js -- --watch",
-    "dryrun": "npm publish --access public -dry-run"
+    "dryrun": "npm publish --access public --dry-run"
   },
   "repository": {
     "type": "git",
