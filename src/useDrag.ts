@@ -28,19 +28,21 @@ export function useDrag<T extends HTMLElement>(
     _setDragging(false)
   }, [])
 
+  // when unmount, unsubscribe
+  useEffect(() => unsubscribe, [])
+
+  // every time we bind new callback to the callback reference
   useEffect(() => {
     const el = getElement(ref)
     if (el) {
       dragCallbackRef.current = dragCallback.bind(el)
       dragEndCallbackRef.current = dragEndCallback.bind(el)
       return () => {
-        unsubscribe()
         dragCallbackRef.current = null
         dragEndCallbackRef.current = null
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref])
+  })
 
   useEvent(ref, 'mousedown', (event: MouseEvent) => {
     // only primary button should be used
