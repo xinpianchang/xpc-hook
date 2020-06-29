@@ -18,7 +18,7 @@ export function useSafeClick<T extends HTMLElement | Document | Window>(
   callbackRef.current = eventListener
 
   const [ mouseDownPoint ] = useState({ x: 0, y: 0 })
-  useEvent(domElementOrRef, ['mousedown', 'click'], evt => {
+  useEvent(domElementOrRef, ['mousedown', 'click'], (evt: MouseEvent) => {
     if (evt.type === 'mousedown') {
       mouseDownPoint.x = evt.clientX
       mouseDownPoint.y = evt.clientY

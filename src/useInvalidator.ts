@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRefObject } from './useRefObject'
-import Invalidator from './invalidator'
+import { Invalidator } from './invalidator'
 
 export type DrawCallback = (
   ctx: CanvasRenderingContext2D,

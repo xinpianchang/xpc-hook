@@ -5,6 +5,10 @@ export interface ResizeEvent extends Event {
   contentRect: DOMRectReadOnly
 }
 
+export function isResizeEvent(evt: Event): evt is ResizeEvent {
+  return 'contentRect' in evt
+}
+
 export interface ResizeObserverProviderProps {
   observer?: ResizeObserver
 }

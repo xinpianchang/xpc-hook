@@ -3,7 +3,7 @@ Create events for the DOM
 */
 
 import { RefObject } from 'react'
-import { getElement } from './utils'
+import { getElement, Unsubscribe } from './utils'
 
 export type SupportEventTarget = Window | Element | Document | EventSource | AbortSignal |
   Animation | ApplicationCache | AudioScheduledSourceNode | BaseAudioContext |
@@ -41,11 +41,28 @@ export type EventNameMap<T extends SupportEventTarget>
 export type EventListenerMap<T extends SupportEventTarget, K extends EventNameMap<T>>
   = (this: T, event: EventMap<T>[K]) => any
 
-export function createEvent<T extends SupportEventTarget, N extends EventNameMap<T>>(
-  domElementOrRef: T | RefObject<T> | null,
-  eventName: N | N[],
-  eventListener: EventListenerMap<T, N>,
-  options: boolean | AddEventListenerOptions = false,
+/**
+ * users can augment this interface to accept other eventmap, like below
+ * ```jsx
+ *   interface CreateEvent extends CreateEventHelper<NewTarget, NewEventMap> {
+ *   }
+ * ```
+ * this will bind createEvent a `NewEventMap` to `NewTarget`
+ */
+export interface CreateEvent {
+  <T extends SupportEventTarget, N extends EventNameMap<T>>(
+    target: T | RefObject<T> | null,
+    type: N | N[],
+    listener: EventListenerMap<T, N>,
+    options?: boolean | AddEventListenerOptions,
+  ): Unsubscribe | undefined
+}
+
+export const createEvent: CreateEvent = function createEvent(
+  domElementOrRef,
+  eventName,
+  eventListener,
+  options = false,
 ) {
   const eventNames = Array.isArray(eventName) ? eventName : [ eventName ]
   if (!domElementOrRef) return
@@ -55,3 +72,13 @@ export function createEvent<T extends SupportEventTarget, N extends EventNameMap
     return () => eventNames.forEach(name => element.removeEventListener(name as string, eventListener as any, options))
   }
 }
+
+export type CreateEventHelper<
+  Targets extends EventTarget,
+  EventMap extends Record<string, Event>,
+> = <T extends Targets, N extends keyof EventMap>(
+  target: T | RefObject<T> | null,
+  type: N | readonly N[],
+  listener: (this: T, event: EventMap[N]) => any,
+  options?: boolean | AddEventListenerOptions,
+) => Unsubscribe | undefined

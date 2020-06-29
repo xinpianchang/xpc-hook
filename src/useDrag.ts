@@ -3,7 +3,7 @@ import { useRefObject } from './useRefObject'
 import { useEvent } from './useEvent'
 import { getElement } from './utils'
 
-type Unsubscribe = (canceled?: false) => void
+export type UnsubscribeWithReason = (canceled?: boolean) => void
 type UnsubscribeFn = (canceled: boolean) => void
 
 export type DragCallback<T extends HTMLElement> = (this: T, event: MouseEvent) => void | boolean
@@ -16,28 +16,31 @@ export function useDrag<T extends HTMLElement>(
   ref: T | RefObject<T> | null,
   dragCallback: DragCallback<T>,
   dragEndCallback: DragEndCallback<T> = noop,
-): [ boolean, Unsubscribe ] {
+): [ boolean, UnsubscribeWithReason ] {
   // dragging state with unsubscribe callback definition
   const unsubscribeRef = useRef<UnsubscribeFn | null>(null)
   const dragCallbackRef = useRef<CallbackRef | null>(null)
   const dragEndCallbackRef = useRef<UnsubscribeFn | null>(null)
   const [ dragging, _setDragging ] = useState(false)
   const draggingRef = useRefObject(dragging)
-  const unsubscribe: Unsubscribe = useCallback(canceled => {
-    unsubscribeRef.current && unsubscribeRef.current(canceled ?? true)
+  const unsubscribe: UnsubscribeWithReason = useCallback((canceled = true) => {
+    unsubscribeRef.current && unsubscribeRef.current(canceled)
     _setDragging(false)
   }, [])
 
   useEffect(() => {
-    const el = getElement(ref) as T
+    const el = getElement(ref)
     if (el) {
       dragCallbackRef.current = dragCallback.bind(el)
       dragEndCallbackRef.current = dragEndCallback.bind(el)
-    } else {
-      dragCallbackRef.current = null
-      dragEndCallbackRef.current = null
+      return () => {
+        unsubscribe()
+        dragCallbackRef.current = null
+        dragEndCallbackRef.current = null
+      }
     }
-  })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref])
 
   useEvent(ref, 'mousedown', (event: MouseEvent) => {
     // only primary button should be used
@@ -101,10 +104,6 @@ export function useDrag<T extends HTMLElement>(
       }
     }
   })
-
-  // on unmount, just unsubscribe
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => unsubscribe, [])
 
   return [ dragging, unsubscribe ]
 }

@@ -1,6 +1,4 @@
-import { RefObject } from 'react'
-
-export type ElementOrRef<T extends EventTarget> = T | RefObject<T>
+export type ElementOrRef<T extends EventTarget> = T | { readonly current: T | null }
 
 export function getElement(ref: null): null
 export function getElement<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] | null
@@ -15,10 +13,10 @@ export function getElement<T extends EventTarget>(selectorsOrElementOrRef: Eleme
     if (typeof document !== 'undefined') {
       return document.querySelector(selectorsOrElementOrRef)
     }
-  } else if ('current' in selectorsOrElementOrRef) {
-    return selectorsOrElementOrRef.current
-  } else {
+  } else if ('dispatchEvent' in selectorsOrElementOrRef) {
     return selectorsOrElementOrRef
+  } else {
+    return selectorsOrElementOrRef.current
   }
   return null
 }
@@ -30,3 +28,5 @@ export function getWindow() {
 export function getDocument() {
   return typeof document === 'undefined' ? null : document
 }
+
+export type Unsubscribe = () => void
