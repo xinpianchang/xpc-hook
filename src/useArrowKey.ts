@@ -1,6 +1,7 @@
 import { RefObject, DependencyList, useRef, useState, useEffect, useCallback } from 'react'
 import { useEvent } from './useEvent'
 import { useRefObject } from './useRefObject'
+import { Unsubscribe } from './utils'
 
 export const ArrowDirection = {
   e: 'e',
@@ -33,7 +34,6 @@ const CounterArrowMap = {
 
 const FirstDelay = 500
 
-type Unsubscribe = () => void
 export const KeyState = {
   Conflict: 'Conflict',
   Pressed: 'Pressed',
@@ -64,18 +64,18 @@ function isArrowKeyCode(code: string): code is keyof ArrowKeyCode {
   return KeyCodeArray.includes(code)
 }
 
-export function useArrowKey<T extends HTMLElement | Document>(
+export function useArrowKey<T extends HTMLElement | Document | Window>(
   ref: T | RefObject<T> | null,
   callback: ActionCallback,
   deps?: DependencyList,
 ): [ boolean, Unsubscribe ]
-export function useArrowKey<T extends HTMLElement | Document>(
+export function useArrowKey<T extends HTMLElement | Document | Window>(
   ref: T | RefObject<T> | null,
   callback: ActionCallback,
   interval: number,
   deps?: DependencyList,
 ): [ boolean, Unsubscribe ]
-export function useArrowKey<T extends HTMLElement | Document>(
+export function useArrowKey<T extends HTMLElement | Document | Window>(
   ref: T | RefObject<T> | null,
   callback: ActionCallback,
   intervalOrDeps?: number | DependencyList,
@@ -175,7 +175,7 @@ export function useArrowKey<T extends HTMLElement | Document>(
     }, delay)
   }
 
-  const unsubscribe = useCallback(() => {
+  const unsubscribe: Unsubscribe = useCallback(() => {
     stopMove()
     directionRef.current = ArrowDirection.none
     setMoving(false)

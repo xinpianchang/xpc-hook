@@ -3,22 +3,51 @@ import { EventListenerMap, SupportEventTarget, EventNameMap, createEvent } from 
 
 /**
  * eventtarget listener hook
- * @param domElementOrRef DOM element or its reference
- * @param eventName event name(s)
- * @param eventListener event listener
+ * @param target DOM element or its reference
+ * @param type event name(s)
+ * @param listener event listener
  * @param options event register options
  * @param deps dependency for the event listener
+ * 
+ * users can augment this interface to accept other eventmap, like below
+ * ```jsx
+ *   interface UseEvent extends UseEventHelper<NewTarget, NewEventMap> {
+ *   }
+ * ```
+ * this will bind useEvent a `NewEventMap` to `NewTarget`
  */
-export function useEvent<T extends SupportEventTarget, N extends EventNameMap<T>>(
-  domElementOrRef: T | RefObject<T> | null,
-  eventName: N | N[],
-  eventListener: EventListenerMap<T, N>,
-  options: boolean | AddEventListenerOptions = false,
-  deps: DependencyList = [],
+export interface UseEvent {
+  <T extends SupportEventTarget, N extends EventNameMap<T>>(
+    target: T | RefObject<T> | null,
+    type: N | readonly N[],
+    listener: EventListenerMap<T, N>,
+    options?: boolean | AddEventListenerOptions,
+    deps?: DependencyList,
+  ): void
+}
+
+export const useEvent: UseEvent = function useEvent(
+  domElementOrRef,
+  eventName,
+  eventListener,
+  options = false,
+  deps = [],
 ) {
   const eventNames = Array.isArray(eventName) ? eventName : [ eventName ]
   useEffect(
-    () => createEvent<T, N>(domElementOrRef, eventNames, eventListener, options),
-    [...eventNames, domElementOrRef, ...deps],
+    // @ts-ignore
+    () => createEvent(domElementOrRef, eventNames, eventListener, options),
+    [domElementOrRef, ...eventNames, ...deps],
   )
 }
+
+export type UseEventHelper<
+  Targets extends EventTarget,
+  EventMap extends Record<string, Event>,
+> = <T extends Targets, N extends keyof EventMap>(
+  target: T | RefObject<T> | null,
+  type: N | N[],
+  listener: (this: T, event: EventMap[N]) => any,
+  options?: boolean | AddEventListenerOptions,
+  deps?: DependencyList,
+) => void
