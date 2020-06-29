@@ -1,14 +1,15 @@
 {
   "presets": [
-    "@babel/typescript",
-    ["@babel/env", {
+    "@babel/preset-typescript",
+    ["@babel/preset-env", {
       "targets": {
         "esmodules": true
       },
       "bugfixes": true,
       "loose": true,
       "modules": "cjs"
-    }]
+    }],
+    "@babel/preset-react"
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",
