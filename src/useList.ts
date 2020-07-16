@@ -126,8 +126,11 @@ export function useList<T>(initialList: ListState<T> = []): [T[], ListActions<T>
       },
 
       set: newList => {
-        list.current = resolveState(newList, list.current)
-        update()
+        const newArr = resolveState(newList, list.current)
+        if (list.current !== newArr) {
+          list.current = newArr
+          update()
+        }
         return a
       },
 
