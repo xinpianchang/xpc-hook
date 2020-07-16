@@ -30,3 +30,17 @@ export function getDocument() {
 }
 
 export type Unsubscribe = () => void
+
+export type StateSetter<T> = (prev: T) => T
+export type InitSetter<T> = () => T
+export type HookState<T> = T | InitSetter<T> | StateSetter<T>
+
+export function resolveState<T>(state: InitSetter<T>): T
+export function resolveState<T, E extends T>(state: StateSetter<T>, current: E): T
+export function resolveState<T, E extends T>(state: HookState<T>, current?: E): T
+export function resolveState<T, E extends T>(state: HookState<T>, current?: E): T {
+  if (typeof state === 'function') {
+    return (state as Function)(current)
+  }
+  return state
+}

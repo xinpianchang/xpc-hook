@@ -5,7 +5,7 @@ const incr = (cnt: number) => cnt + 1
 export interface UseRaf {
   /**
    * use request animation frame (raf) hook with callback
-   * @param timeoutMs timeout to cancel raf
+   * @param timeoutMs timeout to cancel raf, -1 indicate never cancel
    * @param delayMs delay to start raf or stop raf when given null
    * @param callback raf callback
    * @param deps dependency list
@@ -36,6 +36,7 @@ export const useRaf: UseRaf = function useRaf(
   callback?: (() => void) | DependencyList,
   deps: DependencyList = [],
 ) {
+  timeoutMs = timeoutMs < 0 ? 1e10 : timeoutMs
   const [ , update ] = useState(0)
   const cbRef = useRef<() => void>(null!)
   if (callback instanceof Function) {
