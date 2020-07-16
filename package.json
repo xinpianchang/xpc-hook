@@ -84,6 +84,8 @@
     "useInvalidator.d.ts",
     "useRaf.js",
     "useRaf.d.ts",
+    "useList.js",
+    "useList.d.ts",
     "useRefObject.js",
     "useRefObject.d.ts",
     "useResize.js",
