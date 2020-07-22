@@ -2,24 +2,27 @@ import React from 'react'
 import { useRefObject } from './useRefObject'
 import { Invalidator } from './invalidator'
 
-export type DrawCallback = (
-  ctx: CanvasRenderingContext2D,
-  invalidate: () => void,
-) => void
+export interface OnRenderCallbackOptions<T> {
+  target: T
+  invalidate: () => void
+}
 
-class DrawInvalidator extends Invalidator {
-  constructor(private drawCallbackRef: React.MutableRefObject<DrawCallback>) {
+export type OnRenderCallback<T> = (option: OnRenderCallbackOptions<T>) => void
+
+class RenderInvalidator<T = void> extends Invalidator<T> {
+  constructor(private renderCallbackRef: React.MutableRefObject<OnRenderCallback<T>>) {
     super()
   }
 
-  protected onDraw(ctx: CanvasRenderingContext2D, invalidate: () => void) {
-    this.drawCallbackRef.current(ctx, invalidate)
+  public render(target: T) {
+    const invalidate = () => this.invalidate(target)
+    this.renderCallbackRef.current({target, invalidate})
   }
 }
 
-export function useInvalidator(onDraw: DrawCallback) {
-  const drawCallbackRef = useRefObject(onDraw)
-  const [ invalidator ] = React.useState(() => new DrawInvalidator(drawCallbackRef))
+export function useInvalidator<T>(onRender: OnRenderCallback<T>) {
+  const renderCallbackRef = useRefObject(onRender)
+  const [ invalidator ] = React.useState(() => new RenderInvalidator(renderCallbackRef))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(() => () => invalidator.dispose(), [])
   return invalidator
