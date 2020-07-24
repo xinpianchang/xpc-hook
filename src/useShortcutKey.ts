@@ -10,6 +10,12 @@ interface AcceleratorResult {
   key: string
 }
 
+interface ShortcutKeyboardEvent extends KeyboardEvent {
+  accelerators: string[]
+}
+
+type ShortcutKeyCallback = (index: number, evt: ShortcutKeyboardEvent) => void
+
 function analyze(accelerator: string): AcceleratorResult {
   let isCmdOrCtrl = false, isCmd = false, isAlt = false, isCtrl = false, isShift = false
   let key = 'Unknown'
@@ -58,17 +64,17 @@ function test(e: KeyboardEvent, acceleratorResult: AcceleratorResult) {
 }
 
 export function useShortcutKeys(
-  accelerators: readonly string[],
-  callback: (index: number) => any,
+  accelerators: string[],
+  callback: ShortcutKeyCallback,
 ) {
-  const acceleratorsRef = useRefObject(accelerators)
+  const acceleratorsRef = useRefObject<string[]>(accelerators)
   const callbackRef = useRefObject(callback)
   useEvent(document, 'keydown', evt => {
     const accelerators = acceleratorsRef.current
     const callback = callbackRef.current
     const index = accelerators.findIndex(acc => test(evt, analyze(acc)))
     if (index >= 0) {
-      callback(index)
+      callback(index, Object.assign(evt, { accelerators: accelerators }))
       evt.preventDefault()
     }
   })
@@ -76,9 +82,9 @@ export function useShortcutKeys(
 
 export function useShortcutKey(
   accelerator: string,
-  callback: () => any,
+  callback: ShortcutKeyCallback,
 ): void {
-  useShortcutKeys([accelerator], () => callback())
+  useShortcutKeys([accelerator], callback)
 }
 
 

@@ -15,7 +15,12 @@ export const ArrowDirection = {
   none: 'none',
 } as const
 export type ArrowDirection = typeof ArrowDirection
-export type ActionCallback = (direction: keyof ArrowDirection) => void
+
+export interface ArrowKeyboardEvent extends KeyboardEvent {
+  direction: keyof ArrowDirection
+}
+
+export type ActionCallback = (direction: keyof ArrowDirection, evt: ArrowKeyboardEvent) => void
 
 export const ArrowKeyCode = {
   ArrowUp: 'ArrowUp',
@@ -115,7 +120,7 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
         }
 
         // direction sync
-        syncDirection()
+        syncDirection(evt)
       }
     }
   }, false, deps)
@@ -132,19 +137,19 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
         }
 
         // direction sync
-        syncDirection()
+        syncDirection(evt)
       }
     }
   }, false, deps)
 
   // sync direction with the state and reference
-  function syncDirection() {
+  function syncDirection(evt: KeyboardEvent) {
     const direction = getDirectionByKeyStateMap(keyStateMap)
     if (direction !== directionRef.current) {
       directionRef.current = direction
       const isMoving = directionRef.current !== ArrowDirection.none
       setMoving(isMoving)
-      restartMove()
+      restartMove(evt)
       if (isMoving !== movingRef.current) {
         movingRef.current = isMoving
         if (!isMoving) {
@@ -154,9 +159,9 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
     }
   }
 
-  function restartMove() {
+  function restartMove(evt: KeyboardEvent) {
     stopMove()
-    startMove(FirstDelay)
+    startMove(FirstDelay, evt)
   }
 
   function stopMove() {
@@ -166,11 +171,11 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
     }
   }
 
-  function startMove(delay: number) {
-    callbackRef.current(directionRef.current)
+  function startMove(delay: number, evt: KeyboardEvent) {
+    callbackRef.current(directionRef.current, Object.assign(evt, { direction: directionRef.current }))
     timerRef.current = window.setTimeout(() => {
       if (movingRef.current) {
-        startMove(intervalRef.current)
+        startMove(intervalRef.current, evt)
       }
     }, delay)
   }
