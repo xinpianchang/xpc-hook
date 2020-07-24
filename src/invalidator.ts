@@ -10,17 +10,19 @@ const caf = typeof cancelAnimationFrame !== 'undefined'
   ? webkitCancelAnimationFrame
   : () => {}
 
-export abstract class Invalidator {
+export abstract class Invalidator<T> {
   private _requested = 0
   private _disposed = false
 
-  public invalidate(canvas?: HTMLCanvasElement) {
-    if (!this._disposed) {
-      const ctx = canvas?.getContext('2d')
-      if (ctx && !this._requested) {
-        this._requested = raf(() => this.draw(ctx))
-      }
+  public invalidate(target: T) {
+    if (!this._disposed && !this._requested) {
+      this._requested = raf(() => this.doRender(target))
     }
+  }
+
+  private doRender(target: T) {
+    this._requested = 0
+    this.render(target)
   }
 
   public dispose() {
@@ -33,14 +35,5 @@ export abstract class Invalidator {
     }
   }
 
-  public draw(ctx: CanvasRenderingContext2D) {
-    if (!this._disposed) {
-      const invalidate = () => this.invalidate(ctx.canvas)
-      this._requested = 0
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-      this.onDraw(ctx, invalidate)
-    }
-  }
-
-  protected abstract onDraw(ctx: CanvasRenderingContext2D, invalidate: () => void): void
+  public abstract render(target: T): void
 }
