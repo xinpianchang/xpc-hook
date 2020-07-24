@@ -82,6 +82,8 @@
     "useHover.d.ts",
     "useInvalidator.js",
     "useInvalidator.d.ts",
+    "useCanvasInvalidator.js",
+    "useCanvasInvalidator.d.ts",
     "useList.js",
     "useList.d.ts",
     "useRaf.js",
