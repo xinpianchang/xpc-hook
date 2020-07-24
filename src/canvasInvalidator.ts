@@ -2,7 +2,7 @@ import { Invalidator } from './invalidator'
 
 export abstract class CanvasInvalidator extends Invalidator<HTMLCanvasElement> {
   public render(canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas?.getContext('2d')
     if (ctx) {
       const invalidate = () => this.invalidate(canvas)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
