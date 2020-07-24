@@ -10,7 +10,7 @@ interface AcceleratorResult {
   key: string
 }
 
-interface ShortcutKeyboardEvent extends KeyboardEvent {
+export interface ShortcutKeyboardEvent extends KeyboardEvent {
   accelerators: string[]
   index: number
 }
