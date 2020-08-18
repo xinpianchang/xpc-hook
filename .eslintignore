@@ -1,3 +1,4 @@
 src/common/*
 dist
+lib
 *.js

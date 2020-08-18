@@ -2,8 +2,8 @@
   "name": "@newstudios/hook",
   "version": "0.2.0",
   "description": "common hooks for react",
-  "main": "/dist/lib/index.js",
-  "module": "/dist/index.js",
+  "main": "lib/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build:js:cjs": "babel --config-file ./babel.cjs.json src --no-comments --extensions \".ts,.tsx\" --out-dir lib",
