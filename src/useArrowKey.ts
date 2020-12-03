@@ -127,7 +127,12 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
 
   useEvent(ref, 'keyup', evt => {
     const code = evt.code
-    if (isArrowKeyCode(code)) {
+    // FIX: keyup event not firing on OS X when the Meta key is pressed
+    // https://stackoverflow.com/questions/11818637/why-does-javascript-drop-keyup-events-when-the-metakey-is-pressed-on-mac-browser
+    // after keyup meta key, release all arrowKey by default
+    if (evt.key === 'Meta') {
+      return unsubscribe()
+    } else if (isArrowKeyCode(code)) {
       if (keyStateMap[code] !== KeyState.Released) {
         keyStateMap[code] = KeyState.Released
 
@@ -199,7 +204,6 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moving && ref])
-
 
   return [moving, unsubscribe]
 }
