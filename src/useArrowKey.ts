@@ -130,7 +130,8 @@ export function useArrowKey<T extends HTMLElement | Document | Window>(
     // FIX: keyup event not firing on OS X when the Meta key is pressed
     // https://stackoverflow.com/questions/11818637/why-does-javascript-drop-keyup-events-when-the-metakey-is-pressed-on-mac-browser
     // after keyup meta key, release all arrowKey by default
-    if (evt.key === 'Meta') {
+    const isMacintosh = navigator.userAgent.indexOf('Macintosh') >= 0
+    if (evt.key === 'Meta' && isMacintosh) {
       return unsubscribe()
     } else if (isArrowKeyCode(code)) {
       if (keyStateMap[code] !== KeyState.Released) {
