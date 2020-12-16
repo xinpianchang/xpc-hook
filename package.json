@@ -1,6 +1,6 @@
 {
   "name": "@newstudios/hook",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "common hooks for react",
   "main": "lib/index.js",
   "module": "dist/index.js",
