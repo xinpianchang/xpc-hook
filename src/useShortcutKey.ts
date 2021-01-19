@@ -68,10 +68,10 @@ export function useShortcutKeys(
   accelerators: readonly string[] | null,
   callback: ShortcutKeyCallback,
 ) {
-  if (!accelerators) return
   const acceleratorsRef = useRefObject(accelerators)
   const callbackRef = useRefObject(callback)
-  useEvent(document, 'keydown', evt => {
+  useEvent(accelerators ? document : null, 'keydown', evt => {
+    if (!acceleratorsRef.current) return
     const accelerators = acceleratorsRef.current
     const callback = callbackRef.current
     const index = accelerators.findIndex(acc => test(evt, analyze(acc)))
