@@ -13,7 +13,7 @@ export interface ResizeObserverProviderProps {
   observer?: ResizeObserver
 }
 
-type Target = Element & { __resize_event__: boolean }
+type Target = Element & { __resize_event__?: true }
 
 function isDispatchingResizeEvent(target: Target) {
   return target.__resize_event__ === true
