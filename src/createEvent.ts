@@ -50,7 +50,7 @@ export type EventListenerMap<T extends SupportEventTarget, K extends EventNameMa
  * this will bind createEvent a `NewEventMap` to `NewTarget`
  */
 export interface CreateEvent {
-  <T extends SupportEventTarget, N extends EventNameMap<T>>(
+  <T extends SupportEventTarget, N extends EventNameMap<T> & string>(
     target: T | RefObject<T> | null,
     type: N | N[],
     listener: EventListenerMap<T, N>,
@@ -65,11 +65,10 @@ export const createEvent: CreateEvent = function createEvent(
   options = false,
 ) {
   const eventNames = Array.isArray(eventName) ? eventName : [ eventName ]
-  if (!domElementOrRef) return
   const element = getElement(domElementOrRef)
   if (element) {
-    eventNames.forEach(name => element.addEventListener(name as string, eventListener as any, options))
-    return () => eventNames.forEach(name => element.removeEventListener(name as string, eventListener as any, options))
+    eventNames.forEach(name => element.addEventListener(name, eventListener as any, options))
+    return () => eventNames.forEach(name => element.removeEventListener(name, eventListener as any, options))
   }
 }
 

@@ -8,7 +8,7 @@ import { EventListenerMap, SupportEventTarget, EventNameMap, createEvent } from 
  * @param listener event listener
  * @param options event register options
  * @param deps dependency for the event listener
- * 
+ *
  * users can augment this interface to accept other eventmap, like below
  * ```jsx
  *   interface UseEvent extends UseEventHelper<NewTarget, NewEventMap> {
@@ -17,7 +17,7 @@ import { EventListenerMap, SupportEventTarget, EventNameMap, createEvent } from 
  * this will bind useEvent a `NewEventMap` to `NewTarget`
  */
 export interface UseEvent {
-  <T extends SupportEventTarget, N extends EventNameMap<T>>(
+  <T extends SupportEventTarget, N extends EventNameMap<T> & string>(
     target: T | RefObject<T> | null,
     type: N | readonly N[],
     listener: EventListenerMap<T, N>,
