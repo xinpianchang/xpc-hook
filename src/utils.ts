@@ -29,6 +29,14 @@ export function getDocument() {
   return typeof document === 'undefined' ? null : document
 }
 
+/**
+ * Get the root html ref
+ * @returns html element ref
+ */
+export function getDocumentElement() {
+  return typeof document === 'undefined' ? null : document.documentElement
+}
+
 export type Unsubscribe = () => void
 
 export type StateSetter<T> = (prev: T) => T

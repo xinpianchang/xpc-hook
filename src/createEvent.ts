@@ -6,7 +6,7 @@ import { RefObject } from 'react'
 import { getElement, Unsubscribe } from './utils'
 
 export type SupportEventTarget = Window | Element | Document | EventSource | AbortSignal |
-  Animation | ApplicationCache | AudioScheduledSourceNode | BaseAudioContext |
+  Animation | AudioScheduledSourceNode | BaseAudioContext |
   AudioWorkletNode | BroadcastChannel | TextTrackCue | TextTrackList |
   WebSocket | Worker | XMLHttpRequest | XMLHttpRequestEventTarget |
   RTCPeerConnection | EventTarget
@@ -20,7 +20,6 @@ export type EventMap<T extends SupportEventTarget>
   : T extends AbortSignal ? AbortSignalEventMap
   : T extends Worker ? WorkerEventMap
   : T extends Animation ? AnimationEventMap
-  : T extends ApplicationCache ? ApplicationCacheEventMap
   : T extends AudioScheduledSourceNode ? AudioScheduledSourceNodeEventMap
   : T extends BaseAudioContext ? BaseAudioContextEventMap
   : T extends AudioWorkletNode ? AudioWorkletNodeEventMap

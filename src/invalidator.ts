@@ -1,3 +1,6 @@
+declare let webkitRequestAnimationFrame: typeof requestAnimationFrame
+declare let webkitCancelAnimationFrame: typeof cancelAnimationFrame
+
 const raf = typeof requestAnimationFrame !== 'undefined'
   ? requestAnimationFrame
   : typeof webkitRequestAnimationFrame !== 'undefined'
