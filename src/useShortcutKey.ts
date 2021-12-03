@@ -1,26 +1,39 @@
 import { useEvent } from './useEvent'
 import { useRefObject } from './useRefObject'
 
+type GetChars<S> = GetCharsHelper<S, never>
+type GetCharsHelper<S, Acc> = S extends `${infer Char}${infer Rest}` ? GetCharsHelper<Rest, Char | Acc> : Acc
+
+type KeyChar = GetChars<'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'>
+type KeyPuncWithoutShift = GetChars<'`-=[]\\;\',./'>
+type KeyPuncWithShift = GetChars<'~_+{}|:"<>?)(*&^%$#@!'>
+type Key = KeyChar | KeyPuncWithoutShift | KeyPuncWithShift
+type WinMacCtrlKey = 'CmdOrCtrl' | 'Command' | 'Control'
+type AcceleratorCombine<A extends string, B extends string> = `${A}+${B}`
+type AcceleratorModifierWithoutShift = WinMacCtrlKey | 'Alt' | AcceleratorCombine<WinMacCtrlKey, 'Alt'>
+type AcceleratorModifierWithShift = 'Shift' | AcceleratorCombine<WinMacCtrlKey | 'Alt', 'Shift'> | AcceleratorCombine<WinMacCtrlKey, AcceleratorCombine<'Alt', 'Shift'>>
+type Accelerator = KeyChar | KeyPuncWithoutShift | `${AcceleratorModifierWithoutShift}+${KeyChar | KeyPuncWithoutShift}` | `${AcceleratorModifierWithShift}+${KeyChar | KeyPuncWithShift}`
+
+export interface ShortcutKeyboardEvent extends KeyboardEvent {
+  readonly accelerators: readonly Accelerator[]
+  readonly index: number
+}
+
+export type ShortcutKeyCallback = (evt: ShortcutKeyboardEvent) => void
+
 interface AcceleratorResult {
   isCmdOrCtrl: boolean
   isCmd: boolean
   isAlt: boolean
   isCtrl: boolean
   isShift: boolean
-  key: string
+  key: Key | 'Unknown'
 }
 
-export interface ShortcutKeyboardEvent extends KeyboardEvent {
-  accelerators: string[]
-  index: number
-}
-
-type ShortcutKeyCallback = (evt: ShortcutKeyboardEvent) => void
-
-function analyze(accelerator: string): AcceleratorResult {
+function analyze(accelerator: Accelerator): AcceleratorResult {
   let isCmdOrCtrl = false, isCmd = false, isAlt = false, isCtrl = false, isShift = false
-  let key = 'Unknown'
-  accelerator.split('+').forEach(k => {
+  let key: Key | 'Unknown' = 'Unknown'
+  accelerator.split(/\+(?=.)/).forEach(k => {
     switch (k) {
       case 'CmdOrCtrl':
         isCmdOrCtrl = true
@@ -38,7 +51,7 @@ function analyze(accelerator: string): AcceleratorResult {
         isShift = true
         break
       default:
-        key = k
+        key = k as Key
         break
     }
   })
@@ -53,7 +66,7 @@ function test(e: KeyboardEvent, acceleratorResult: AcceleratorResult) {
     return false
   }
 
-  const isMac = !!navigator.platform.match('Mac')
+  const isMac = !!navigator.userAgent.match('Mac')
   const isOnlyMeta = e.metaKey && !e.ctrlKey
   const isOnlyCtrl = !e.metaKey && e.ctrlKey
 
@@ -65,7 +78,7 @@ function test(e: KeyboardEvent, acceleratorResult: AcceleratorResult) {
 }
 
 export function useShortcutKeys(
-  accelerators: readonly string[] | null,
+  accelerators: readonly Accelerator[] | null,
   callback: ShortcutKeyCallback,
 ) {
   const acceleratorsRef = useRefObject(accelerators)
@@ -77,16 +90,14 @@ export function useShortcutKeys(
     const index = accelerators.findIndex(acc => test(evt, analyze(acc)))
 
     if (index >= 0) {
-      callback(Object.assign(evt, { accelerators: accelerators as string[], index }))
+      callback(Object.assign(evt, { accelerators, index }))
     }
   })
 }
 
 export function useShortcutKey(
-  accelerator: string | null,
+  accelerator: Accelerator | null,
   callback: ShortcutKeyCallback,
 ): void {
   useShortcutKeys(accelerator ? [accelerator] : null, callback)
 }
-
-
