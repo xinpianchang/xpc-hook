@@ -1,7 +1,7 @@
-import { RefObject, useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { useRefObject } from './useRefObject'
 import { useEvent } from './useEvent'
-import { getElement } from './utils'
+import { getElement, InferTargetRef, TargetRef } from './utils'
 
 export type UnsubscribeWithReason = (canceled?: boolean) => void
 type UnsubscribeFn = (canceled: boolean) => void
@@ -12,10 +12,10 @@ export type DragEndCallback<T extends HTMLElement> = (this: T, canceled: boolean
 type CallbackRef = (evt: MouseEvent) => void | boolean
 const noop = () => {}
 
-export function useDrag<T extends HTMLElement>(
-  ref: T | RefObject<T> | null,
-  dragCallback: DragCallback<T>,
-  dragEndCallback: DragEndCallback<T> = noop,
+export function useDrag<T extends TargetRef<HTMLElement>>(
+  ref: T,
+  dragCallback: DragCallback<InferTargetRef<T>>,
+  dragEndCallback: DragEndCallback<InferTargetRef<T>> = noop,
 ): [ boolean, UnsubscribeWithReason ] {
   // dragging state with unsubscribe callback definition
   const unsubscribeRef = useRef<UnsubscribeFn | null>(null)

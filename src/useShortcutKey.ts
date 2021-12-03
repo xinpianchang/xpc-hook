@@ -1,5 +1,7 @@
+import { getDocumentRef } from './getDocumentRef'
 import { useEvent } from './useEvent'
 import { useRefObject } from './useRefObject'
+import { TargetRef } from './utils'
 
 type GetChars<S> = GetCharsHelper<S, never>
 type GetCharsHelper<S, Acc> = S extends `${infer Char}${infer Rest}` ? GetCharsHelper<Rest, Char | Acc> : Acc
@@ -80,10 +82,11 @@ function test(e: KeyboardEvent, acceleratorResult: AcceleratorResult) {
 export function useShortcutKeys(
   accelerators: readonly Accelerator[] | null,
   callback: ShortcutKeyCallback,
+  refOrElement: TargetRef<HTMLElement | Document> = getDocumentRef(),
 ) {
   const acceleratorsRef = useRefObject(accelerators)
   const callbackRef = useRefObject(callback)
-  useEvent(accelerators ? document : null, 'keydown', evt => {
+  useEvent(refOrElement, 'keydown', evt => {
     if (!acceleratorsRef.current) return
     const accelerators = acceleratorsRef.current
     const callback = callbackRef.current
@@ -98,6 +101,7 @@ export function useShortcutKeys(
 export function useShortcutKey(
   accelerator: Accelerator | null,
   callback: ShortcutKeyCallback,
+  refOrElement: TargetRef<HTMLElement | Document> = getDocumentRef(),
 ): void {
-  useShortcutKeys(accelerator ? [accelerator] : null, callback)
+  useShortcutKeys(accelerator ? [accelerator] : null, callback, refOrElement)
 }

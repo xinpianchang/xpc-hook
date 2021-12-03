@@ -1,11 +1,12 @@
 import { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import { useServerHandoffComplete } from './useServerHandoffComplete'
 
 export function getDevicePixelRatio() {
   return typeof devicePixelRatio === 'number' ? devicePixelRatio : 1
 }
 
-export function useDevicePixelRatio(ssr = false): [ number, Dispatch<SetStateAction<number>> ] {
-  const [ dpr, setDpr ] = useState(ssr ? 1 : getDevicePixelRatio)
+export function useDevicePixelRatio(): [ number, Dispatch<SetStateAction<number>> ] {
+  const [ dpr, setDpr ] = useState(useServerHandoffComplete() ? getDevicePixelRatio : 1)
 
   useEffect(() => {
     const mqString = `(resolution: ${dpr}dppx)`

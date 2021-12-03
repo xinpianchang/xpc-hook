@@ -1,44 +1,54 @@
 import { useEvent } from './useEvent'
-import { RefObject, DependencyList, useRef } from 'react'
-import { getElement, getDocument } from './utils'
+import { useRef } from 'react'
+import { getElement, TargetRef, InferTargetRef } from './utils'
+import { getDocumentRef } from './getDocumentRef'
 
-type EventNameMap = keyof DocumentEventMap
+type EventNameMap = 'click' | 'touchstart' | 'mousedown' | 'mouseup' | 'touchend' | 'touchcancel' | 'touchmove' | 'mousemove'
+type EventListenerMap<T extends TargetRef, N extends EventNameMap> = (this: InferTargetRef<T>, event: DocumentEventMap[N]) => any
 
-type EventListenerMap<T extends HTMLElement, K extends EventNameMap>
-  = (this: T, event: DocumentEventMap[K]) => any
-
-export function useClickAway<T extends HTMLElement, N extends EventNameMap>(
-  domElementOrRef: T | RefObject<T> | null,
+export function useClickAway<T extends TargetRef<HTMLElement>, N extends EventNameMap>(
+  domElementOrRef: T,
   eventName: N | N[],
   eventListener: EventListenerMap<T, N>,
-  deps?: DependencyList,
 ): void
-export function useClickAway<T extends HTMLElement>(
-  domElementOrRef: T | RefObject<T> | null,
-  eventListener: EventListenerMap<T, 'click' | 'touchstart'>,
-  deps?: DependencyList,
+export function useClickAway<T extends TargetRef<HTMLElement>>(
+  domElementOrRef: T,
+  eventListener: EventListenerMap<T, 'mousedown' | 'touchstart'>,
 ): void
-export function useClickAway<T extends HTMLElement, N extends EventNameMap>(
-  domElementOrRef: T | RefObject<T> | null,
-  eventNameOrListener: N | N[] | EventListenerMap<T, 'click' | 'touchstart'>,
-  eventListenerOrDeps?: EventListenerMap<T, N> | DependencyList,
-  deps: DependencyList = [],
+export function useClickAway<T extends TargetRef<HTMLElement>, N extends EventNameMap>(
+  domElementOrRef: T,
+  eventNameOrListener: N | N[] | EventListenerMap<T, N>,
+  eventListener: EventListenerMap<T, N> = () => {},
 ) {
   const eventListenerRef = useRef<EventListenerMap<T, N>>(undefined!)
   let eventName: N | N[]
+  let needPreventDefaultOnTouchEnd = false
   if (eventNameOrListener instanceof Function) {
     eventName = ['mousedown', 'touchstart'] as N[]
-    eventListenerRef.current = eventNameOrListener as EventListenerMap<T, N>
-    deps = (eventListenerOrDeps as DependencyList | undefined) || []
+    eventListenerRef.current = eventNameOrListener
+    needPreventDefaultOnTouchEnd = true
   } else {
     eventName = eventNameOrListener
-    eventListenerRef.current = eventListenerOrDeps as EventListenerMap<T, N>
+    eventListenerRef.current = eventListener
   }
 
-  useEvent(domElementOrRef ? getDocument() : null, eventName, evt => {
+  useEvent(domElementOrRef ? getDocumentRef() : null, eventName, evt => {
     const element = getElement(domElementOrRef)
     if (element && evt.target && !element.contains(evt.target as Node)) {
+      if (needPreventDefaultOnTouchEnd && evt.type === 'touchstart') {
+        // default touch event should be prevented on touchend, in case to avoid mousedown to be trigger the second times
+        const touchEndCallback = (evt: TouchEvent) => {
+          evt.preventDefault()
+          document.removeEventListener('touchcancel', touchCancelCallback)
+        }
+        const touchCancelCallback = () => {
+          document.removeEventListener('touchend', touchEndCallback)
+        }
+        document.addEventListener('touchend', touchEndCallback, { once: true })
+        document.addEventListener('touchcancel', touchCancelCallback, { once: true})
+      }
+
       return eventListenerRef.current.call(element, evt)
     }
-  }, false, deps)
+  })
 }

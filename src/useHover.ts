@@ -1,9 +1,10 @@
-import React, { useState, RefObject } from 'react'
+import React, { useState } from 'react'
 import { useEvent } from './useEvent'
 import { useClickAway } from './useClickAway'
+import { TargetRef } from './utils'
 
-export function useHover<T extends HTMLElement>(
-  refOrElement: T | RefObject<T> | null,
+export function useHover<T extends TargetRef<HTMLElement>>(
+  refOrElement: T,
   supportTouch = false
 ): [ boolean, React.Dispatch<React.SetStateAction<boolean>> ] {
   const [hover, setHover] = useState(false)

@@ -2,8 +2,7 @@
 Create events for the DOM
 */
 
-import { RefObject } from 'react'
-import { getElement, Unsubscribe } from './utils'
+import { getElement, InferTargetRef, TargetRef, Unsubscribe } from './utils'
 
 export type SupportEventTarget = Window | Element | Document | EventSource | AbortSignal |
   Animation | AudioScheduledSourceNode | BaseAudioContext |
@@ -16,6 +15,7 @@ export type EventMap<T extends SupportEventTarget>
   : T extends Document ? DocumentEventMap
   : T extends HTMLMediaElement ? HTMLMediaElementEventMap
   : T extends HTMLElement ? HTMLElementEventMap
+  : T extends SVGElement ? SVGElementEventMap
   : T extends EventSource ? EventSourceEventMap
   : T extends AbortSignal ? AbortSignalEventMap
   : T extends Worker ? WorkerEventMap
@@ -49,10 +49,10 @@ export type EventListenerMap<T extends SupportEventTarget, K extends EventNameMa
  * this will bind createEvent a `NewEventMap` to `NewTarget`
  */
 export interface CreateEvent {
-  <T extends SupportEventTarget, N extends EventNameMap<T> & string>(
-    target: T | RefObject<T> | null,
+  <T extends TargetRef, N extends EventNameMap<InferTargetRef<T>> & string>(
+    target: T,
     type: N | N[],
-    listener: EventListenerMap<T, N>,
+    listener: EventListenerMap<InferTargetRef<T>, N>,
     options?: boolean | AddEventListenerOptions,
   ): Unsubscribe | undefined
 }
@@ -75,7 +75,7 @@ export type CreateEventHelper<
   Targets extends EventTarget,
   EventMap extends Record<string, Event>,
 > = <T extends Targets, N extends keyof EventMap>(
-  target: T | RefObject<T> | null,
+  target: TargetRef<T>,
   type: N | readonly N[],
   listener: (this: T, event: EventMap[N]) => any,
   options?: boolean | AddEventListenerOptions,

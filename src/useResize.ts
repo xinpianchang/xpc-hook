@@ -1,26 +1,29 @@
 import { RefObject, useEffect } from 'react'
 import { ResizeEvent } from './ResizeObserverContext'
 import { useResizeObserver } from './useResizeObserver'
-import { getElement } from './utils'
+import { getElement, InferTargetRef, TargetRef } from './utils'
 import { useRefObject } from './useRefObject'
 
 export type ResizeCallback<T extends Element = Element> = (this: T, event: ResizeEvent) => void
 export type WindowResizeCallback = (this: Window, event: UIEvent) => void
 
 export interface UseResize {
-  <T extends Element>(
-    refOrElement: RefObject<T> | T | null,
-    callback: ResizeCallback<T>,
+  <T extends TargetRef<Element>>(
+    refOrElement: T,
+    callback: ResizeCallback<InferTargetRef<T>>,
+    options?: boolean | AddEventListenerOptions,
   ): void
   (
-    WindowRef: Window | null,
+    WindowRef: Window | RefObject<Window> | null,
     callback: WindowResizeCallback,
+    options?: boolean | AddEventListenerOptions,
   ): void
 }
 
 export const useResize: UseResize = function useResize<T extends Element>(
   refOrElement: RefObject<T> | T | Window | null,
   callback: ResizeCallback | WindowResizeCallback,
+  options: boolean | AddEventListenerOptions = false,
 ) {
   const observer = useResizeObserver()
   const callbackRef = useRefObject(callback)
@@ -30,9 +33,10 @@ export const useResize: UseResize = function useResize<T extends Element>(
     if (target) {
       const listener = (evt: Event) => {
         // @ts-ignore
-        callbackRef.current.call(target, evt)
+        return callbackRef.current.call(target, evt)
       }
-      target.addEventListener('resize', listener as EventListener, false)
+      const opt = options
+      target.addEventListener('resize', listener as EventListener, opt)
       if (target instanceof Element) {
         observer.observe(target)
       }
@@ -40,7 +44,7 @@ export const useResize: UseResize = function useResize<T extends Element>(
         if (target instanceof Element) {
           observer.unobserve(target)
         }
-        target.removeEventListener('resize', listener as EventListener, false)
+        target.removeEventListener('resize', listener as EventListener, opt)
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,7 +1,7 @@
-import { RefObject, DependencyList, useRef, useState, useEffect, useCallback } from 'react'
+import { DependencyList, useRef, useState, useEffect, useCallback } from 'react'
 import { useEvent } from './useEvent'
 import { useRefObject } from './useRefObject'
-import { Unsubscribe } from './utils'
+import { TargetRef, Unsubscribe } from './utils'
 
 export const ArrowDirection = {
   e: 'e',
@@ -69,19 +69,19 @@ function isArrowKeyCode(code: string): code is keyof ArrowKeyCode {
   return KeyCodeArray.includes(code)
 }
 
-export function useArrowKey<T extends HTMLElement | Document | Window>(
-  ref: T | RefObject<T> | null,
+export function useArrowKey(
+  ref: TargetRef<HTMLElement | Document | Window>,
   callback: ActionCallback,
   deps?: DependencyList,
 ): [ boolean, Unsubscribe ]
-export function useArrowKey<T extends HTMLElement | Document | Window>(
-  ref: T | RefObject<T> | null,
+export function useArrowKey(
+  ref: TargetRef<HTMLElement | Document | Window>,
   callback: ActionCallback,
   interval: number,
   deps?: DependencyList,
 ): [ boolean, Unsubscribe ]
-export function useArrowKey<T extends HTMLElement | Document | Window>(
-  ref: T | RefObject<T> | null,
+export function useArrowKey(
+  ref: TargetRef<HTMLElement | Document | Window>,
   callback: ActionCallback,
   intervalOrDeps?: number | DependencyList,
   deps: DependencyList = [],
