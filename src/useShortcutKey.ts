@@ -6,15 +6,21 @@ import { TargetRef } from './utils'
 type GetChars<S> = GetCharsHelper<S, never>
 type GetCharsHelper<S, Acc> = S extends `${infer Char}${infer Rest}` ? GetCharsHelper<Rest, Char | Acc> : Acc
 
+type EditingKey = "Backspace" | "Clear" | "Copy" | "CrSel" | "Cut" | "Delete" | "EraseEof" | "ExSel" | "Insert" | "Paste" | "Redo" | "Undo"
+type NavigationKey = "ArrowDown" | "ArrowLeft" | "ArrowRight" | "ArrowUp" | "End" | "Home" | "PageDown" | "PageUp"
+type WhitespaceKey = "Enter" | "Tab" | " "
+type KeyNeedModifier = EditingKey | NavigationKey | WhitespaceKey
+
 type KeyChar = GetChars<'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'>
 type KeyPuncWithoutShift = GetChars<'`-=[]\\;\',./'>
 type KeyPuncWithShift = GetChars<'~_+{}|:"<>?)(*&^%$#@!'>
-type Key = KeyChar | KeyPuncWithoutShift | KeyPuncWithShift
+type Key = KeyChar | KeyPuncWithoutShift | KeyPuncWithShift | KeyNeedModifier
+
 type WinMacCtrlKey = 'CmdOrCtrl' | 'Command' | 'Control'
 type AcceleratorCombine<A extends string, B extends string> = `${A}+${B}`
 type AcceleratorModifierWithoutShift = WinMacCtrlKey | 'Alt' | AcceleratorCombine<WinMacCtrlKey, 'Alt'>
 type AcceleratorModifierWithShift = 'Shift' | AcceleratorCombine<WinMacCtrlKey | 'Alt', 'Shift'> | AcceleratorCombine<WinMacCtrlKey, AcceleratorCombine<'Alt', 'Shift'>>
-type Accelerator = KeyChar | KeyPuncWithoutShift | `${AcceleratorModifierWithoutShift}+${KeyChar | KeyPuncWithoutShift}` | `${AcceleratorModifierWithShift}+${KeyChar | KeyPuncWithShift}`
+type Accelerator = KeyChar | KeyPuncWithoutShift | `${AcceleratorModifierWithoutShift}+${KeyChar | KeyPuncWithoutShift | KeyNeedModifier}` | `${AcceleratorModifierWithShift}+${KeyChar | KeyPuncWithShift | KeyNeedModifier}`
 
 export interface ShortcutKeyboardEvent extends KeyboardEvent {
   readonly accelerators: readonly Accelerator[]
